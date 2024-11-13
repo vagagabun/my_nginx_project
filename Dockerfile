@@ -1,10 +1,15 @@
-# Start with an official Apache image
-FROM httpd:alpine
+# Use the official Nginx image
+FROM nginx:alpine
 
-# Copy the Apache config and website files
-COPY httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY desktop /usr/local/apache2/htdocs/desktop
-COPY mobile /usr/local/apache2/htdocs/mobile
+# Copy the Nginx configuration file
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy the project files
+COPY desktop /usr/share/nginx/html/desktop
+COPY mobile /usr/share/nginx/html/mobile
 
 # Expose port 80
 EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
