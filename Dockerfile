@@ -1,15 +1,10 @@
-# Используем официальный образ Nginx
-FROM nginx:alpine
+# Start with an official Apache image
+FROM httpd:alpine
 
-# Копируем нашу конфигурацию Nginx в контейнер
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy the Apache config and website files
+COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY desktop /usr/local/apache2/htdocs/desktop
+COPY mobile /usr/local/apache2/htdocs/mobile
 
-# Копируем папки с проектом (desktop и mobile) в контейнер
-COPY desktop /usr/share/nginx/html/desktop
-COPY mobile /usr/share/nginx/html/mobile
-
-# Открываем порт 80
+# Expose port 80
 EXPOSE 80
-
-# Запускаем Nginx
-CMD ["nginx", "-g", "daemon off;"]
