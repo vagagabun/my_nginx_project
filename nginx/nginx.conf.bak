@@ -18,8 +18,12 @@ http {
         }
 
         # Let Certbot use this directory for verification
-        location /.well-known/acme-challenge/ {
-            root /var/www/certbot;
+        location /.well-known {
+            proxy_pass http://certbot:6000;
+        }
+#        location /.well-known/acme-challenge/ {
+#            root /var/www/certbot/www/.well-known/acme-challenge;
+#            allow all;
         }
     }
 

@@ -2,26 +2,46 @@ version: '3.7'
 
 services:
   nginx:
+    networks:
+      - site
     image: nginx:latest
     container_name: nginx_server
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./html:/usr/share/nginx/html:ro
-      - ./certificates:/etc/nginx/certs:ro
+      - ./nginx/cert.pem:/etc/cert.pem
+      - ./nginx/key.pem:/etc/key.pem
+      # - ./certificates:/etc/nginx/certs:ro
     depends_on:
       - certbot
 
   certbot:
+    ports:
+      - "6000:80"
+    env_file: 
+      - .env
+    networks:
+      - site
     image: certbot/certbot:latest
     container_name: certbot
     volumes:
-      - ./certificates:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: >
-      /bin/sh -c 'trap exit TERM;
-      while :; do sleep 12h & wait $${!};
-      certbot renew --webroot -w /var/www/certbot;
-      done'
+      - ./nginx/:/etc/nginx/
+    build:
+      context: ./certbot
+      dockerfile: Dockerfile
+      args:
+        DOMAIN_EMAIL: ${DOMAIN_EMAIL}
+        DOMAIN_URL: ${DOMAIN_URL}
+      #- ./certificates:/etc/letsencrypt
+      #- ./certbot/www:/var/www/certbot
+    #entrypoint: >
+    #  /bin/sh -c 'trap exit TERM;
+    #  while :; do sleep 12h & wait $${!};
+    #  certbot renew --webroot -w /var/www/certbot;
+    #  done'
+
+networks:
+  site:
